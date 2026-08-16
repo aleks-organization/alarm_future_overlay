@@ -1,0 +1,28 @@
+name: alarm_future_overlay
+description: A Flutter plugin for full-screen alarm overlays on Android and iOS.
+  Supports scheduling alarms, lock-screen overlay with sound, vibration, and
+  snooze/dismiss actions.
+version: 0.1.0
+homepage: https://github.com/example/alarm_future_overlay
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.7.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.example.alarm_future_overlay
+        pluginClass: AlarmFutureOverlayPlugin
+      ios:
+        pluginClass: AlarmFutureOverlayPlugin

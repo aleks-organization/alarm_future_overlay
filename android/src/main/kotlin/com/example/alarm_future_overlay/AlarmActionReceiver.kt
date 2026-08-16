@@ -1,0 +1,38 @@
+package com.example.alarm_future_overlay
+
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+
+class AlarmActionReceiver : BroadcastReceiver() {
+
+    companion object {
+        const val ACTION_SNOOZE = "com.example.alarm_future_overlay.ACTION_SNOOZE"
+        const val ACTION_CLOSE = "com.example.alarm_future_overlay.ACTION_CLOSE"
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        val id = intent.getIntExtra("alarm_id", 0)
+        val time = intent.getLongExtra("alarm_time", 0L)
+
+        val action = when (intent.action) {
+            ACTION_SNOOZE -> {
+                AlarmScheduler.snooze(context, id)
+                "snooze"
+            }
+            ACTION_CLOSE -> {
+                AlarmScheduler.dismiss(context, id)
+                "close"
+            }
+            else -> return
+        }
+
+        try {
+            AlarmFutureOverlayPlugin.dartEventSink?.success(
+                mapOf("action" to action, "id" to id, "time" to time)
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+}

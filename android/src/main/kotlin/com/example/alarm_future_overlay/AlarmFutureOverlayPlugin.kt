@@ -60,7 +60,10 @@ class AlarmFutureOverlayPlugin : FlutterPlugin, MethodChannel.MethodCallHandler,
                 val time = (args?.get("time") as? Long) ?: 0L
                 val label = (args?.get("label") as? String) ?: "Alarm"
                 val sound = args?.get("sound") as? String
-                result.success(AlarmScheduler.schedule(ctx, id, time, label, sound))
+                val volume = (args?.get("volume") as? Double) ?: 1.0
+                result.success(
+                    AlarmScheduler.schedule(ctx, id, time, label, sound, volume.toFloat())
+                )
             }
             "cancelOverlay" -> {
                 val args = call.arguments as? Map<*, *>

@@ -20,11 +20,12 @@ class OverlayAlarmReceiver : BroadcastReceiver() {
         val time = intent.getLongExtra("overlay_time", System.currentTimeMillis())
         val label = intent.getStringExtra("alarm_label") ?: "Alarm"
         val sound = intent.getStringExtra("alarm_sound")
+        val volume = intent.getFloatExtra("alarm_volume", 1f)
 
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         createChannel(nm)
 
-        val fullScreenPending = buildActivityPending(context, id, time, label, sound)
+        val fullScreenPending = buildActivityPending(context, id, time, label, sound, volume)
         val snoozePending = buildActionPending(context, id, time, AlarmActionReceiver.ACTION_SNOOZE)
         val dismissPending = buildActionPending(context, id, time, AlarmActionReceiver.ACTION_CLOSE)
 
@@ -55,7 +56,8 @@ class OverlayAlarmReceiver : BroadcastReceiver() {
         id: Int,
         time: Long,
         label: String,
-        sound: String?
+        sound: String?,
+        volume: Float
     ): PendingIntent {
         val activityIntent = Intent(context, AlarmActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -63,6 +65,7 @@ class OverlayAlarmReceiver : BroadcastReceiver() {
             putExtra("alarm_time", time)
             putExtra("alarm_label", label)
             putExtra("alarm_sound", sound)
+            putExtra("alarm_volume", volume)
         }
         return PendingIntent.getActivity(
             context, id, activityIntent,

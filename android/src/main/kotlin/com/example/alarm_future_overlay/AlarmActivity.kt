@@ -32,6 +32,7 @@ class AlarmActivity : Activity() {
     private var alarmTime: Long = 0L
     private var alarmLabel: String = "Alarm"
     private var alarmSound: String? = null
+    private var alarmVolume: Float = 1f
 
     companion object {
         @Volatile
@@ -52,6 +53,7 @@ class AlarmActivity : Activity() {
         alarmTime = intent.getLongExtra("alarm_time", 0L)
         alarmLabel = intent.getStringExtra("alarm_label") ?: "Alarm"
         alarmSound = intent.getStringExtra("alarm_sound")
+        alarmVolume = intent.getFloatExtra("alarm_volume", 1f)
 
         // Volume rocker controls the alarm stream while the alarm is ringing
         volumeControlStream = AudioManager.STREAM_ALARM
@@ -176,14 +178,15 @@ class AlarmActivity : Activity() {
     private fun startAlarmSound() {
         try {
             audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val maxVolume =
+                audioManager?.getStreamMaxVolume(AudioManager.STREAM_ALARM) ?: 0
             originalAlarmVolume =
                 audioManager?.getStreamVolume(AudioManager.STREAM_ALARM) ?: -1
-            if (originalAlarmVolume == 0) {
-                val maxVolume =
-                    audioManager?.getStreamMaxVolume(AudioManager.STREAM_ALARM) ?: 0
-                // Alarm stream is normally not muted by vibrate mode, but if it is,
-                // force it so the alarm is audible anyway (like the system Clock app).
-                audioManager?.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0)
+            // Apply the alarm's configured volume. If it differs from the current
+            // stream volume (e.g. muted by vibrate mode), adjust it temporarily.
+            val desiredVolume = (maxVolume * alarmVolume).toInt().coerceIn(0, maxVolume)
+            if (desiredVolume != originalAlarmVolume) {
+                audioManager?.setStreamVolume(AudioManager.STREAM_ALARM, desiredVolume, 0)
             }
 
             mediaPlayer = MediaPlayer()

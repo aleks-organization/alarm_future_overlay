@@ -11,13 +11,21 @@ object AlarmScheduler {
 
     const val SNOOZE_MILLIS = 10 * 60 * 1000L
 
-    fun schedule(context: Context, id: Int, timeMillis: Long, label: String, sound: String?): Boolean {
+    fun schedule(
+        context: Context,
+        id: Int,
+        timeMillis: Long,
+        label: String,
+        sound: String?,
+        volume: Float = 1f
+    ): Boolean {
         return try {
             val intent = Intent(context, OverlayAlarmReceiver::class.java).apply {
                 putExtra("overlay_id", id)
                 putExtra("overlay_time", timeMillis)
                 putExtra("alarm_label", label)
                 putExtra("alarm_sound", sound)
+                putExtra("alarm_volume", volume)
             }
             val pending = PendingIntent.getBroadcast(
                 context, id, intent,
@@ -33,7 +41,7 @@ object AlarmScheduler {
             } else {
                 am.set(AlarmManager.RTC_WAKEUP, timeMillis, pending)
             }
-            AlarmStore.save(context, id, timeMillis, label, sound)
+            AlarmStore.save(context, id, timeMillis, label, sound, volume)
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -63,7 +71,7 @@ object AlarmScheduler {
         cancelNotification(context, id)
         val alarm = AlarmStore.get(context, id) ?: return false
         val newTime = System.currentTimeMillis() + SNOOZE_MILLIS
-        return schedule(context, id, newTime, alarm.label, alarm.sound)
+        return schedule(context, id, newTime, alarm.label, alarm.sound, alarm.volume)
     }
 
     fun dismiss(context: Context, id: Int): Boolean {
@@ -75,7 +83,14 @@ object AlarmScheduler {
         val now = System.currentTimeMillis()
         for (alarm in AlarmStore.getAll(context)) {
             if (alarm.timeMillis > now) {
-                schedule(context, alarm.id, alarm.timeMillis, alarm.label, alarm.sound)
+                schedule(
+                    context,
+                    alarm.id,
+                    alarm.timeMillis,
+                    alarm.label,
+                    alarm.sound,
+                    alarm.volume
+                )
             } else {
                 AlarmStore.remove(context, alarm.id)
             }

@@ -11,13 +11,21 @@ object AlarmStore {
         val id: Int,
         val timeMillis: Long,
         val label: String,
-        val sound: String?
+        val sound: String?,
+        val volume: Float
     )
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    fun save(context: Context, id: Int, timeMillis: Long, label: String, sound: String?) {
+    fun save(
+        context: Context,
+        id: Int,
+        timeMillis: Long,
+        label: String,
+        sound: String?,
+        volume: Float = 1f
+    ) {
         val p = prefs(context)
         val ids = p.getStringSet(KEY_IDS, emptySet())?.toMutableSet() ?: mutableSetOf()
         ids.add(id.toString())
@@ -26,6 +34,7 @@ object AlarmStore {
             .putLong("time_$id", timeMillis)
             .putString("label_$id", label)
             .putString("sound_$id", sound)
+            .putFloat("volume_$id", volume)
             .apply()
     }
 
@@ -38,6 +47,7 @@ object AlarmStore {
             .remove("time_$id")
             .remove("label_$id")
             .remove("sound_$id")
+            .remove("volume_$id")
             .apply()
     }
 
@@ -48,7 +58,8 @@ object AlarmStore {
             id = id,
             timeMillis = p.getLong("time_$id", 0L),
             label = p.getString("label_$id", "Alarm") ?: "Alarm",
-            sound = p.getString("sound_$id", null)
+            sound = p.getString("sound_$id", null),
+            volume = p.getFloat("volume_$id", 1f)
         )
     }
 

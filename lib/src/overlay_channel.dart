@@ -52,17 +52,21 @@ class AlarmFutureOverlay {
   /// [label] - optional label displayed on the overlay
   /// [sound] - optional sound filename (without extension). Must be in the
   ///   app's assets (Android) or bundle (iOS). Falls back to system default.
+  /// [volume] - optional alarm volume as a fraction of the max (0.0 - 1.0).
+  ///   Defaults to 1.0 (full alarm volume).
   static Future<void> schedule(
     int id,
     DateTime when, {
     String label = 'Alarm',
     String? sound,
+    double? volume,
   }) async {
     await _channel.invokeMethod('scheduleOverlay', {
       'id': id,
       'time': when.millisecondsSinceEpoch,
       'label': label,
       'sound': sound,
+      'volume': volume ?? 1.0,
     });
   }
 

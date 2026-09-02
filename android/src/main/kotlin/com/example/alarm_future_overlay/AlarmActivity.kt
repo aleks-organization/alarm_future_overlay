@@ -173,25 +173,26 @@ class AlarmActivity : Activity() {
     private fun startAlarmSound() {
         try {
             audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            originalAlarmVolume = audioManager?.getStreamVolume(AudioManager.STREAM_ALARM) ?: -1
+            originalAlarmVolume =
+                audioManager?.getStreamVolume(AudioManager.STREAM_MUSIC) ?: -1
             if (originalAlarmVolume == 0) {
                 val maxVolume =
-                    audioManager?.getStreamMaxVolume(AudioManager.STREAM_ALARM) ?: 0
-                // Alarm must be audible even when the phone is in vibrate/silent mode
-                audioManager?.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0)
+                    audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC) ?: 0
+                // Playback stream is not muted by vibrate/silent mode
+                audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0)
             }
 
             mediaPlayer = MediaPlayer()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mediaPlayer?.setAudioAttributes(
                     AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ALARM)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                         .build()
                 )
             } else {
                 @Suppress("DEPRECATION")
-                mediaPlayer?.setAudioStreamType(AudioManager.STREAM_ALARM)
+                mediaPlayer?.setAudioStreamType(AudioManager.STREAM_MUSIC)
             }
 
             val soundFile = alarmSound ?: "over_the_horizon.mp3"
@@ -212,13 +213,13 @@ class AlarmActivity : Activity() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     setAudioAttributes(
                         AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_ALARM)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                             .build()
                     )
                 } else {
                     @Suppress("DEPRECATION")
-                    setAudioStreamType(AudioManager.STREAM_ALARM)
+                    setAudioStreamType(AudioManager.STREAM_MUSIC)
                 }
                 setDataSource(
                     this@AlarmActivity,
@@ -293,7 +294,7 @@ class AlarmActivity : Activity() {
         if (originalAlarmVolume >= 0) {
             try {
                 audioManager?.setStreamVolume(
-                    AudioManager.STREAM_ALARM,
+                    AudioManager.STREAM_MUSIC,
                     originalAlarmVolume,
                     0
                 )

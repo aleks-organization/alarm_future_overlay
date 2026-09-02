@@ -1,15 +1,12 @@
 package com.example.alarm_future_overlay
 
-import android.app.KeyguardManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.media.RingtoneManager
 import android.os.Build
-import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 
 class OverlayAlarmReceiver : BroadcastReceiver() {
@@ -42,11 +39,9 @@ class OverlayAlarmReceiver : BroadcastReceiver() {
             .addAction(android.R.drawable.ic_menu_recent_history, "Snooze", snoozePending)
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Dismiss", dismissPending)
 
-        if (shouldFullScreen(context)) {
-            builder.setFullScreenIntent(fullScreenPending, true)
-        } else {
-            builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
-        }
+        // Always launch the full-screen alarm popup (not a heads-up toast),
+        // regardless of the screen/lock state. AlarmActivity plays the sound.
+        builder.setFullScreenIntent(fullScreenPending, true)
 
         try {
             nm.notify(id, builder.build())
@@ -91,18 +86,6 @@ class OverlayAlarmReceiver : BroadcastReceiver() {
             context, requestCode, actionIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or immutableFlag()
         )
-    }
-
-    private fun shouldFullScreen(context: Context): Boolean {
-        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        val km = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-        val screenOn = pm.isInteractive
-        val locked = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            km.isDeviceLocked
-        } else {
-            km.isKeyguardLocked
-        }
-        return !screenOn || locked
     }
 
     private fun createChannel(nm: NotificationManager) {

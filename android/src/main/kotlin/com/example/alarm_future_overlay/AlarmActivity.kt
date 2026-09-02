@@ -26,6 +26,8 @@ import java.util.Locale
 class AlarmActivity : Activity() {
     private var mediaPlayer: MediaPlayer? = null
     private var vibrator: Vibrator? = null
+    private var audioManager: AudioManager? = null
+    private var originalAlarmVolume: Int = -1
     private var alarmId: Int = 0
     private var alarmTime: Long = 0L
     private var alarmLabel: String = "Alarm"
@@ -170,6 +172,15 @@ class AlarmActivity : Activity() {
 
     private fun startAlarmSound() {
         try {
+            audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            originalAlarmVolume = audioManager?.getStreamVolume(AudioManager.STREAM_ALARM) ?: -1
+            if (originalAlarmVolume == 0) {
+                val maxVolume =
+                    audioManager?.getStreamMaxVolume(AudioManager.STREAM_ALARM) ?: 0
+                // Alarm must be audible even when the phone is in vibrate/silent mode
+                audioManager?.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0)
+            }
+
             mediaPlayer = MediaPlayer()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mediaPlayer?.setAudioAttributes(
@@ -275,6 +286,21 @@ class AlarmActivity : Activity() {
             }
         }
         mediaPlayer = null
+        restoreAlarmVolume()
+    }
+
+    private fun restoreAlarmVolume() {
+        if (originalAlarmVolume >= 0) {
+            try {
+                audioManager?.setStreamVolume(
+                    AudioManager.STREAM_ALARM,
+                    originalAlarmVolume,
+                    0
+                )
+            } catch (_: Exception) {
+            }
+            originalAlarmVolume = -1
+        }
     }
 
     private fun stopVibration() {

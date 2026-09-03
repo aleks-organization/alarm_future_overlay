@@ -7,7 +7,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class OverlayAlarmReceiver : BroadcastReceiver() {
 
@@ -29,6 +33,12 @@ class OverlayAlarmReceiver : BroadcastReceiver() {
         val snoozePending = buildActionPending(context, id, time, AlarmActionReceiver.ACTION_SNOOZE)
         val dismissPending = buildActionPending(context, id, time, AlarmActionReceiver.ACTION_CLOSE)
 
+        // Custom content views with always-visible SNOOZE/DISMISS buttons.
+        val collapsedView = buildContentView(context, R.layout.alarm_notification, time, label)
+        val bigView = buildContentView(context, R.layout.alarm_notification_big, time, label)
+        bindButtons(collapsedView, snoozePending, dismissPending)
+        bindButtons(bigView, snoozePending, dismissPending)
+
         val builder = NotificationCompat.Builder(context, ALARM_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setContentTitle("Alarm")
@@ -37,8 +47,9 @@ class OverlayAlarmReceiver : BroadcastReceiver() {
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setAutoCancel(true)
-            .addAction(android.R.drawable.ic_menu_recent_history, "Snooze", snoozePending)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Dismiss", dismissPending)
+            .setContentIntent(fullScreenPending)
+            .setCustomContentView(collapsedView)
+            .setCustomBigContentView(bigView)
 
         // Always launch the full-screen alarm popup (not a heads-up toast),
         // regardless of the screen/lock state. AlarmActivity plays the sound.
@@ -49,6 +60,31 @@ class OverlayAlarmReceiver : BroadcastReceiver() {
         } catch (e: SecurityException) {
             e.printStackTrace()
         }
+    }
+
+    private fun buildContentView(
+        context: Context,
+        layoutRes: Int,
+        time: Long,
+        label: String
+    ): RemoteViews {
+        val views = RemoteViews(context.packageName, layoutRes)
+        views.setTextViewText(R.id.alarm_title, "ALARM")
+        views.setTextViewText(
+            R.id.alarm_time,
+            SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(time))
+        )
+        views.setTextViewText(R.id.alarm_label, label)
+        return views
+    }
+
+    private fun bindButtons(
+        views: RemoteViews,
+        snoozePending: PendingIntent,
+        dismissPending: PendingIntent
+    ) {
+        views.setOnClickPendingIntent(R.id.btn_snooze, snoozePending)
+        views.setOnClickPendingIntent(R.id.btn_dismiss, dismissPending)
     }
 
     private fun buildActivityPending(

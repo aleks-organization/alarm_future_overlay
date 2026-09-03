@@ -24,6 +24,7 @@ public class AlarmFutureOverlayPlugin: NSObject, FlutterPlugin {
         let instance = AlarmFutureOverlayPlugin()
         shared = instance
         instance.setupChannels(with: registrar)
+        instance.registerNotificationCategories()
         registrar.addMethodCallDelegate(instance, channel: instance.methodChannel!)
     }
 

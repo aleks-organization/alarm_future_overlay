@@ -1,4 +1,4 @@
-package com.example.alarm_future_overlay
+package com.example.alarm_overlay
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -7,8 +7,8 @@ import android.content.Intent
 class AlarmActionReceiver : BroadcastReceiver() {
 
     companion object {
-        const val ACTION_SNOOZE = "com.example.alarm_future_overlay.ACTION_SNOOZE"
-        const val ACTION_CLOSE = "com.example.alarm_future_overlay.ACTION_CLOSE"
+        const val ACTION_SNOOZE = "com.example.alarm_overlay.ACTION_SNOOZE"
+        const val ACTION_CLOSE = "com.example.alarm_overlay.ACTION_CLOSE"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -28,7 +28,7 @@ class AlarmActionReceiver : BroadcastReceiver() {
         }
 
         try {
-            AlarmFutureOverlayPlugin.dartEventSink?.success(
+            AlarmOverlayPlugin.dartEventSink?.success(
                 mapOf("action" to action, "id" to id, "time" to time)
             )
         } catch (e: Exception) {

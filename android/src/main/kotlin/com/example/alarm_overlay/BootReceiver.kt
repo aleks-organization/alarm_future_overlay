@@ -1,4 +1,4 @@
-package com.example.alarm_future_overlay
+package com.example.alarm_overlay
 
 import android.content.BroadcastReceiver
 import android.content.Context

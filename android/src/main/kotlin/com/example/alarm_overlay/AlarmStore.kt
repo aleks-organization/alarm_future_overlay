@@ -1,10 +1,10 @@
-package com.example.alarm_future_overlay
+package com.example.alarm_overlay
 
 import android.content.Context
 
 object AlarmStore {
 
-    private const val PREFS_NAME = "alarm_future_overlay_alarms"
+    private const val PREFS_NAME = "alarm_overlay_alarms"
     private const val KEY_IDS = "alarm_ids"
 
     data class StoredAlarm(

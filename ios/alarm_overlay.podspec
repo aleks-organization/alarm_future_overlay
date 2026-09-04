@@ -1,8 +1,8 @@
 Pod::Spec.new do |s|
-  s.name             = 'alarm_future_overlay'
+  s.name             = 'alarm_overlay'
   s.version          = '0.1.0'
   s.summary          = 'A Flutter plugin for full-screen alarm overlays on iOS.'
-  s.homepage         = 'https://github.com/example/alarm_future_overlay'
+  s.homepage         = 'https://github.com/aleks-organization/alarm_overlay'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }

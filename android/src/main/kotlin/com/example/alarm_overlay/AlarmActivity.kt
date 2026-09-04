@@ -1,4 +1,4 @@
-package com.example.alarm_future_overlay
+package com.example.alarm_overlay
 
 import android.app.Activity
 import android.app.KeyguardManager
@@ -277,7 +277,7 @@ class AlarmActivity : Activity() {
 
     private fun notifyFlutter(action: String) {
         try {
-            AlarmFutureOverlayPlugin.dartEventSink?.success(
+            AlarmOverlayPlugin.dartEventSink?.success(
                 mapOf("action" to action, "id" to alarmId, "time" to alarmTime)
             )
         } catch (e: Exception) {

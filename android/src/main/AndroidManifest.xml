@@ -10,7 +10,7 @@
 
     <application>
         <activity
-            android:name="com.example.alarm_future_overlay.AlarmActivity"
+            android:name="com.example.alarm_overlay.AlarmActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:launchMode="singleInstance"
             android:excludeFromRecents="true"
@@ -20,15 +20,15 @@
             android:exported="false" />
 
         <receiver
-            android:name="com.example.alarm_future_overlay.OverlayAlarmReceiver"
+            android:name="com.example.alarm_overlay.OverlayAlarmReceiver"
             android:exported="false" />
 
         <receiver
-            android:name="com.example.alarm_future_overlay.AlarmActionReceiver"
+            android:name="com.example.alarm_overlay.AlarmActionReceiver"
             android:exported="false" />
 
         <receiver
-            android:name="com.example.alarm_future_overlay.BootReceiver"
+            android:name="com.example.alarm_overlay.BootReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

@@ -1,4 +1,4 @@
-group 'com.example.alarm_future_overlay'
+group 'com.example.alarm_overlay'
 version '0.1.0'
 
 buildscript {
@@ -24,7 +24,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    namespace 'com.example.alarm_future_overlay'
+    namespace 'com.example.alarm_overlay'
     compileSdk 34
 
     compileOptions {

@@ -3,12 +3,12 @@ import UIKit
 import UserNotifications
 import AVFoundation
 
-public class AlarmFutureOverlayPlugin: NSObject, FlutterPlugin {
+public class AlarmOverlayPlugin: NSObject, FlutterPlugin {
 
     private static let snoozeActionIdentifier = "SNOOZE_ACTION"
     private static let dismissActionIdentifier = "DISMISS_ACTION"
     private static let alarmCategoryIdentifier = "ALARM_CATEGORY"
-    private static let defaultsKey = "alarm_future_overlay_alarms"
+    private static let defaultsKey = "alarm_overlay_alarms"
     private static let snoozeMillis: Int64 = 10 * 60 * 1000
 
     private var methodChannel: FlutterMethodChannel?
@@ -18,10 +18,10 @@ public class AlarmFutureOverlayPlugin: NSObject, FlutterPlugin {
 
     /// The active plugin instance, used by the host AppDelegate to forward
     /// `UNUserNotificationCenterDelegate` calls.
-    public static weak var shared: AlarmFutureOverlayPlugin?
+    public static weak var shared: AlarmOverlayPlugin?
 
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let instance = AlarmFutureOverlayPlugin()
+        let instance = AlarmOverlayPlugin()
         shared = instance
         instance.setupChannels(with: registrar)
         instance.registerNotificationCategories()
@@ -32,12 +32,12 @@ public class AlarmFutureOverlayPlugin: NSObject, FlutterPlugin {
         let messenger = registrar.messenger()
 
         methodChannel = FlutterMethodChannel(
-            name: "com.example.alarm_future/overlay",
+            name: "com.example.alarm_overlay/overlay",
             binaryMessenger: messenger
         )
 
         eventChannel = FlutterEventChannel(
-            name: "com.example.alarm_future/overlay_events",
+            name: "com.example.alarm_overlay/overlay_events",
             binaryMessenger: messenger
         )
         eventChannel?.setStreamHandler(self)
@@ -105,17 +105,17 @@ public class AlarmFutureOverlayPlugin: NSObject, FlutterPlugin {
 
     private func registerNotificationCategories() {
         let snoozeAction = UNNotificationAction(
-            identifier: AlarmFutureOverlayPlugin.snoozeActionIdentifier,
+            identifier: AlarmOverlayPlugin.snoozeActionIdentifier,
             title: "Snooze",
             options: []
         )
         let dismissAction = UNNotificationAction(
-            identifier: AlarmFutureOverlayPlugin.dismissActionIdentifier,
+            identifier: AlarmOverlayPlugin.dismissActionIdentifier,
             title: "Dismiss",
             options: [.destructive]
         )
         let category = UNNotificationCategory(
-            identifier: AlarmFutureOverlayPlugin.alarmCategoryIdentifier,
+            identifier: AlarmOverlayPlugin.alarmCategoryIdentifier,
             actions: [snoozeAction, dismissAction],
             intentIdentifiers: [],
             options: [.customDismissAction]
@@ -139,7 +139,7 @@ public class AlarmFutureOverlayPlugin: NSObject, FlutterPlugin {
         if #available(iOS 15.0, *) {
             content.interruptionLevel = .critical
         }
-        content.categoryIdentifier = AlarmFutureOverlayPlugin.alarmCategoryIdentifier
+        content.categoryIdentifier = AlarmOverlayPlugin.alarmCategoryIdentifier
         content.userInfo = [
             "alarm_id": id,
             "alarm_time": timeMillis,
@@ -182,7 +182,7 @@ public class AlarmFutureOverlayPlugin: NSObject, FlutterPlugin {
         guard let data = getAlarm(id: id) else { return }
         let label = data["label"] as? String ?? "Alarm"
         let sound = data["sound"] as? String
-        let newTime = Int64(Date().timeIntervalSince1970 * 1000) + AlarmFutureOverlayPlugin.snoozeMillis
+        let newTime = Int64(Date().timeIntervalSince1970 * 1000) + AlarmOverlayPlugin.snoozeMillis
         scheduleAlarm(id: id, timeMillis: newTime, label: label, sound: sound)
 
         eventSink?(["action": "snooze", "id": id, "time": newTime])
@@ -204,23 +204,23 @@ public class AlarmFutureOverlayPlugin: NSObject, FlutterPlugin {
     // MARK: - Persistence (UserDefaults)
 
     private func saveAlarm(id: Int, timeMillis: Int64, label: String, sound: String?) {
-        var dict = UserDefaults.standard.dictionary(forKey: AlarmFutureOverlayPlugin.defaultsKey) ?? [:]
+        var dict = UserDefaults.standard.dictionary(forKey: AlarmOverlayPlugin.defaultsKey) ?? [:]
         dict[String(id)] = [
             "time": timeMillis,
             "label": label,
             "sound": sound ?? ""
         ]
-        UserDefaults.standard.set(dict, forKey: AlarmFutureOverlayPlugin.defaultsKey)
+        UserDefaults.standard.set(dict, forKey: AlarmOverlayPlugin.defaultsKey)
     }
 
     private func removeAlarm(id: Int) {
-        var dict = UserDefaults.standard.dictionary(forKey: AlarmFutureOverlayPlugin.defaultsKey) ?? [:]
+        var dict = UserDefaults.standard.dictionary(forKey: AlarmOverlayPlugin.defaultsKey) ?? [:]
         dict.removeValue(forKey: String(id))
-        UserDefaults.standard.set(dict, forKey: AlarmFutureOverlayPlugin.defaultsKey)
+        UserDefaults.standard.set(dict, forKey: AlarmOverlayPlugin.defaultsKey)
     }
 
     private func getAlarm(id: Int) -> [String: Any]? {
-        let dict = UserDefaults.standard.dictionary(forKey: AlarmFutureOverlayPlugin.defaultsKey) ?? [:]
+        let dict = UserDefaults.standard.dictionary(forKey: AlarmOverlayPlugin.defaultsKey) ?? [:]
         return dict[String(id)] as? [String: Any]
     }
 
@@ -255,9 +255,9 @@ public class AlarmFutureOverlayPlugin: NSObject, FlutterPlugin {
         let id = userInfo["alarm_id"] as? Int ?? 0
 
         switch response.actionIdentifier {
-        case AlarmFutureOverlayPlugin.snoozeActionIdentifier:
+        case AlarmOverlayPlugin.snoozeActionIdentifier:
             snoozeAlarm(id: id)
-        case AlarmFutureOverlayPlugin.dismissActionIdentifier:
+        case AlarmOverlayPlugin.dismissActionIdentifier:
             dismissAlarm(id: id)
         default:
             presentAlarmViewController(with: userInfo)
@@ -309,7 +309,7 @@ public class AlarmFutureOverlayPlugin: NSObject, FlutterPlugin {
 
 // MARK: - FlutterStreamHandler
 
-extension AlarmFutureOverlayPlugin: FlutterStreamHandler {
+extension AlarmOverlayPlugin: FlutterStreamHandler {
     public func onListen(
         withArguments arguments: Any?,
         eventSink events: @escaping FlutterEventSink

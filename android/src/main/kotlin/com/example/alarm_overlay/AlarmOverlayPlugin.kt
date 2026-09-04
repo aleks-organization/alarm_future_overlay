@@ -1,4 +1,4 @@
-package com.example.alarm_future_overlay
+package com.example.alarm_overlay
 
 import android.content.Context
 import android.content.Intent
@@ -12,7 +12,7 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
-class AlarmFutureOverlayPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.StreamHandler {
+class AlarmOverlayPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.StreamHandler {
 
     private lateinit var channel: MethodChannel
     private lateinit var eventChannel: EventChannel
@@ -21,10 +21,10 @@ class AlarmFutureOverlayPlugin : FlutterPlugin, MethodChannel.MethodCallHandler,
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         applicationContext = flutterPluginBinding.applicationContext
 
-        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "com.example.alarm_future/overlay")
+        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "com.example.alarm_overlay/overlay")
         channel.setMethodCallHandler(this)
 
-        eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "com.example.alarm_future/overlay_events")
+        eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "com.example.alarm_overlay/overlay_events")
         eventChannel.setStreamHandler(this)
     }
 

@@ -1,4 +1,4 @@
-# alarm_future_overlay
+# alarm_overlay
 
 A Flutter plugin for full-screen alarms on Android and iOS.
 
@@ -15,10 +15,10 @@ A Flutter plugin for full-screen alarms on Android and iOS.
 ## Usage
 
 ```dart
-import 'package:alarm_future_overlay/alarm_future_overlay.dart';
+import 'package:alarm_overlay/alarm_overlay.dart';
 
 // Schedule an alarm
-await AlarmFutureOverlay.schedule(
+await AlarmOverlay.schedule(
   42,
   DateTime.now().add(Duration(minutes: 1)),
   label: 'Wake up!',
@@ -26,10 +26,10 @@ await AlarmFutureOverlay.schedule(
 );
 
 // Cancel a scheduled alarm
-await AlarmFutureOverlay.cancel(42);
+await AlarmOverlay.cancel(42);
 
 // Listen for user actions
-AlarmFutureOverlay.onAction.listen((event) {
+AlarmOverlay.onAction.listen((event) {
   if (event.action == OverlayAction.close) {
     print('Alarm ${event.id} dismissed');
   } else if (event.action == OverlayAction.snooze) {
@@ -38,14 +38,14 @@ AlarmFutureOverlay.onAction.listen((event) {
 });
 
 // Check / request permissions
-if (!await AlarmFutureOverlay.hasPermission()) {
-  await AlarmFutureOverlay.requestPermission();
+if (!await AlarmOverlay.hasPermission()) {
+  await AlarmOverlay.requestPermission();
 }
 ```
 
 ## How the Android alarm works
 
-1. `AlarmFutureOverlay.schedule()` calls the native side, which persists the alarm
+1. `AlarmOverlay.schedule()` calls the native side, which persists the alarm
    (SharedPreferences) and schedules an exact alarm via
    `AlarmManager.setExactAndAllowWhileIdle()`.
 2. At the alarm time, `OverlayAlarmReceiver` fires and checks the screen state:
@@ -93,7 +93,7 @@ Required permissions (declared automatically):
 | `VIBRATE`, `WAKE_LOCK` | Vibration and keeping the CPU awake for sound |
 
 > **Note (Android 13+):** the user must grant notification permission. Call
-> `AlarmFutureOverlay.requestPermission()` (or use `permission_handler`) before
+> `AlarmOverlay.requestPermission()` (or use `permission_handler`) before
 > scheduling.
 >
 > **Note (Android 14+):** full-screen intents are restricted by the system.
@@ -107,7 +107,7 @@ Add a **sound file** (e.g. `over_the_horizon.mp3`) to your Xcode project bundle.
 The iOS notification includes **Snooze/Dismiss action buttons** and uses the
 **critical alert** interruption level (iOS 15+). Critical alerts require the
 user to grant the "Critical Alerts" permission — request it with
-`AlarmFutureOverlay.requestPermission()`.
+`AlarmOverlay.requestPermission()`.
 
 **Important:** iOS cannot show a custom full-screen view when the app is in the
 background or terminated. The alarm fires as a notification with sound. To show
@@ -115,14 +115,14 @@ the full-screen alarm view when the user opens/taps the notification, forward
 `UNUserNotificationCenterDelegate` calls to the plugin in your `AppDelegate`:
 
 ```swift
-import alarm_future_overlay
+import alarm_overlay
 
 override func userNotificationCenter(
     _ center: UNUserNotificationCenter,
     willPresent notification: UNNotification,
     withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
 ) {
-    let plugin = AlarmFutureOverlayPlugin()
+    let plugin = AlarmOverlayPlugin()
     if !plugin.handleNotificationWillPresent(notification, completionHandler: completionHandler) {
         completionHandler([.alert, .sound, .badge])
     }
@@ -133,7 +133,7 @@ override func userNotificationCenter(
     didReceive response: UNNotificationResponse,
     withCompletionHandler completionHandler: @escaping () -> Void
 ) {
-    let plugin = AlarmFutureOverlayPlugin()
+    let plugin = AlarmOverlayPlugin()
     if !plugin.handleNotificationDidReceive(response, completionHandler: completionHandler) {
         completionHandler()
     }
@@ -142,24 +142,24 @@ override func userNotificationCenter(
 
 ## API Reference
 
-### `AlarmFutureOverlay.schedule(id, when, {label, sound})`
+### `AlarmOverlay.schedule(id, when, {label, sound})`
 Schedule an alarm overlay at the given `DateTime`.
 
-### `AlarmFutureOverlay.cancel(id)`
+### `AlarmOverlay.cancel(id)`
 Cancel a previously scheduled alarm.
 
-### `AlarmFutureOverlay.stop()`
+### `AlarmOverlay.stop()`
 Dismiss the currently displayed alarm (full-screen activity on Android, alarm
 view controller on iOS) without changing the scheduled alarm state. Useful when
 deleting an alarm that is currently ringing.
 
-### `AlarmFutureOverlay.hasPermission()`
+### `AlarmOverlay.hasPermission()`
 Returns `true` if the platform-specific permission is granted.
 
-### `AlarmFutureOverlay.requestPermission()`
+### `AlarmOverlay.requestPermission()`
 Opens system settings for the user to grant the required permission.
 
-### `AlarmFutureOverlay.onAction`
+### `AlarmOverlay.onAction`
 A `Stream<OverlayActionEvent>` emitting user interactions from the alarm.
 
 ### `OverlayActionEvent`

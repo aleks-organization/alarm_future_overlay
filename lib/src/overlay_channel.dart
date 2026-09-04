@@ -28,11 +28,11 @@ class OverlayActionEvent {
   }
 }
 
-class AlarmFutureOverlay {
+class AlarmOverlay {
   static const MethodChannel _channel =
-      MethodChannel('com.example.alarm_future/overlay');
+      MethodChannel('com.example.alarm_overlay/overlay');
   static const EventChannel _events =
-      EventChannel('com.example.alarm_future/overlay_events');
+      EventChannel('com.example.alarm_overlay/overlay_events');
 
   static Stream<OverlayActionEvent> get onAction =>
       _events.receiveBroadcastStream().map((event) {
